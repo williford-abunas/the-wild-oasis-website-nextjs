@@ -4,7 +4,10 @@ import Logo from "@/app/_components/Logo";
 import "@/app/_styles/globals.css";
 
 export const metadata: Metadata = {
-  title: "The Wild Oasis",
+  title: {
+    template: "%s | The Wild Oasis",
+    default: "Welcome / The Wild Oasis",
+  },
   description: "The Wild Oasis is a cabin rental company in the mountains of Colorado.",
 };
 
@@ -15,8 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-      >
+      <body className="bg-primary-950 text-primary-50 min-h-screen">
         <header>
           <Logo />
           <Navigation />
