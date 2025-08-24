@@ -1,7 +1,13 @@
 import type { Metadata } from "next";
-import Navigation from "@/app/_components/Navigation";
-import Logo from "@/app/_components/Logo";
+import Header from "@/app/_components/Header";
 import "@/app/_styles/globals.css";
+
+import { Josefin_Sans } from "next/font/google";
+
+const josefinSans = Josefin_Sans({
+  subsets: ["latin"],
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: {
@@ -18,12 +24,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="bg-primary-950 text-primary-50 min-h-screen">
-        <header>
-          <Logo />
-          <Navigation />
-        </header>
-        <main>{children}</main>
+      <body className={`${josefinSans.className} antialiased bg-primary-950 text-primary-50 min-h-screen flex flex-col`}>
+       <Header />
+       <div className="flex-1 p-8 py-12">
+          <main className="max-w-7xl mx-auto">{children}</main>
+       </div>
       </body>
     </html>
   );
