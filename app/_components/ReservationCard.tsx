@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { PencilSquareIcon } from "@heroicons/react/24/solid";
 import { format, formatDistance, isPast, isToday, parseISO } from "date-fns";
-import DeleteReservation from "@/app/_components/DeleteReservation";
+import DeleteReservation from "./DeleteReservation";
 import Image from "next/image";
 
 export const formatDistanceFromNow = (dateStr: string) =>
