@@ -22,9 +22,12 @@ export default function Page() {
         home away from home. The perfect spot for a peaceful, calm vacation.
         Welcome to paradise.
       </p>
-      {/* <Suspense fallback={<Spinner />}>
+      <Suspense fallback={<div className="grid items-center justify-center min-h-[200px]">
+    <Spinner />
+    <p className="text-primary-200">Loading cabin data...</p>
+  </div>}>
         <CabinList />
-      </Suspense> */}
+      </Suspense>
     </div>
   );
 }
