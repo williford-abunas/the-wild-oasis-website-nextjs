@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { EyeSlashIcon, MapPinIcon, UsersIcon } from "@heroicons/react/24/solid";
 import { getCabin, getCabins } from "@/app/_lib/data-service";
+import { Cabin } from "@/app/_lib/types";
 import Image from "next/image";
 
 type Props = {
@@ -9,7 +10,7 @@ type Props = {
 
 export async function generateMetadata({ params }: Props) {
   const { cabinId } = await params;
-  const { name } = await getCabin(cabinId);
+  const { name } = await getCabin(Number(cabinId));
 
   return {
     title: `Cabin ${name}`,
@@ -17,7 +18,7 @@ export async function generateMetadata({ params }: Props) {
 }
 
 export async function generateStaticParams() {
-  const cabins = await getCabins();
+  const cabins: Cabin[] = await getCabins();
   const ids = cabins.map((cabin) => ({ cabinId: String(cabin.id) }));
 
   return ids;
@@ -25,7 +26,7 @@ export async function generateStaticParams() {
 
 export default async function Page({ params }: Props) {
   const { cabinId } = await params;
-  const cabin = await getCabin(cabinId);
+  const cabin: Cabin = await getCabin(Number(cabinId));
   const {
     id,
     name,

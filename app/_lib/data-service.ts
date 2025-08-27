@@ -2,56 +2,19 @@
 import { notFound } from "next/navigation";
 import { eachDayOfInterval } from "date-fns";
 import { supabase } from "@/app/_lib/supabase";
-
-// Define types for better type safety
-interface Cabin {
-  id: number;
-  name: string;
-  max_capacity: number;
-  regular_price: number;
-  discount: number;
-  image: string;
-}
-
-interface CabinPrice {
-  regular_price: number;
-  discount: number;
-}
-
-interface Guest {
-  id: number;
-  email: string;
-  full_name: string;
-  national_id: string;
-  nationality: string;
-  country_flag: string;
-}
-
-interface Booking {
-  id: number;
-  created_at: string;
-  start_date: string;
-  end_date: string;
-  number_nights: number;
-  number_guests: number;
-  total_price: number;
-  guest_id: number;
-  cabin_id: number;
-  status: string;
-}
-
-interface Settings {
-  id: number;
-  min_booking_length: number;
-  max_booking_length: number;
-  max_guests_per_booking: number;
-  breakfast_price: number;
-}
-
-interface Country {
-  name: string;
-  flag: string;
-}
+import {
+  Cabin,
+  CabinPrice,
+  Guest,
+  Booking,
+  Settings,
+  Country,
+  BookingWithCabin,
+  CreateGuestData,
+  CreateBookingData,
+  UpdateGuestData,
+  UpdateBookingData,
+} from "@/app/_lib/types";
 
 /////////////
 // GET
@@ -100,7 +63,7 @@ export async function getCabinPrice(id: number): Promise<CabinPrice | null> {
 export const getCabins = async function (): Promise<Cabin[]> {
   const { data, error } = await supabase
     .from("cabins")
-    .select("id, name, max_capacity, regular_price, discount, image")
+    .select("id, name, max_capacity, regular_price, discount, image, description")
     .order("name");
 
   if (error) {
@@ -146,18 +109,7 @@ export async function getBooking(id: number): Promise<Booking> {
   return data;
 }
 
-export async function getBookings(guestId: number): Promise<Array<{
-  id: number;
-  created_at: string;
-  start_date: string;
-  end_date: string;
-  number_nights: number;
-  number_guests: number;
-  total_price: number;
-  guest_id: number;
-  cabin_id: number;
-  cabins: { name: string; image: string }[];
-}>> {
+export async function getBookings(guestId: number): Promise<BookingWithCabin[]> {
   const { data, error, count } = await supabase
     .from("bookings")
     // We actually also need data on the cabins as well. But let's ONLY take the data that we actually need, in order to reduce downloaded data.
@@ -243,7 +195,7 @@ export async function getCountries(): Promise<Country[]> {
 /////////////
 // CREATE
 
-export async function createGuest(newGuest: Omit<Guest, 'id'>): Promise<Guest[]> {
+export async function createGuest(newGuest: CreateGuestData): Promise<Guest[]> {
   const { data, error } = await supabase.from("guests").insert([newGuest]);
 
   if (error) {
@@ -258,7 +210,7 @@ export async function createGuest(newGuest: Omit<Guest, 'id'>): Promise<Guest[]>
   return data || [];
 }
 
-export async function createBooking(newBooking: Omit<Booking, 'id' | 'created_at'>): Promise<Booking> {
+export async function createBooking(newBooking: CreateBookingData): Promise<Booking> {
   const { data, error } = await supabase
     .from("bookings")
     .insert([newBooking])
@@ -282,7 +234,7 @@ export async function createBooking(newBooking: Omit<Booking, 'id' | 'created_at
 // UPDATE
 
 // The updatedFields is an object which should ONLY contain the updated data
-export async function updateGuest(id: number, updatedFields: Partial<Guest>): Promise<Guest> {
+export async function updateGuest(id: number, updatedFields: UpdateGuestData): Promise<Guest> {
   const { data, error } = await supabase
     .from("guests")
     .update(updatedFields)
@@ -301,7 +253,7 @@ export async function updateGuest(id: number, updatedFields: Partial<Guest>): Pr
   return data;
 }
 
-export async function updateBooking(id: number, updatedFields: Partial<Booking>): Promise<Booking> {
+export async function updateBooking(id: number, updatedFields: UpdateBookingData): Promise<Booking> {
   const { data, error } = await supabase
     .from("bookings")
     .update(updatedFields)
