@@ -25,6 +25,7 @@ function CabinCard({ cabin }: CabinCardProps) {
           alt={`Cabin ${name}`}
           className="flex-1 border-r border-primary-800 object-cover"
           fill
+          sizes="(max-width: 640px) 100vw, 50vw"
         />
       </div>
 

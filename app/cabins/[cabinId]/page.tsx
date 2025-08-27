@@ -45,6 +45,8 @@ export default async function Page({ params }: Props) {
             src={image}
             alt={`Cabin ${name}`}
             className="object-cover rounded-md"
+            sizes="(max-width: 400px) 100vw, 50vw"
+            quality={75}
             fill
           />
         </div>
