@@ -2,10 +2,61 @@
 import { notFound } from "next/navigation";
 import { eachDayOfInterval } from "date-fns";
 import { supabase } from "@/app/_lib/supabase";
+
+// Define types for better type safety
+interface Cabin {
+  id: number;
+  name: string;
+  max_capacity: number;
+  regular_price: number;
+  discount: number;
+  image: string;
+}
+
+interface CabinPrice {
+  regular_price: number;
+  discount: number;
+}
+
+interface Guest {
+  id: number;
+  email: string;
+  full_name: string;
+  national_id: string;
+  nationality: string;
+  country_flag: string;
+}
+
+interface Booking {
+  id: number;
+  created_at: string;
+  start_date: string;
+  end_date: string;
+  number_nights: number;
+  number_guests: number;
+  total_price: number;
+  guest_id: number;
+  cabin_id: number;
+  status: string;
+}
+
+interface Settings {
+  id: number;
+  min_booking_length: number;
+  max_booking_length: number;
+  max_guests_per_booking: number;
+  breakfast_price: number;
+}
+
+interface Country {
+  name: string;
+  flag: string;
+}
+
 /////////////
 // GET
 
-export async function getCabin(id) {
+export async function getCabin(id: number): Promise<Cabin> {
   const { data, error } = await supabase
     .from("cabins")
     .select("*")
@@ -28,7 +79,7 @@ export async function getCabin(id) {
   return data;
 }
 
-export async function getCabinPrice(id) {
+export async function getCabinPrice(id: number): Promise<CabinPrice | null> {
   const { data, error } = await supabase
     .from("cabins")
     .select("regular_price, discount")
@@ -36,20 +87,28 @@ export async function getCabinPrice(id) {
     .single();
 
   if (error) {
-    console.error(error);
+    if (error instanceof Error) {
+      console.error("getCabinPrice error:", error.message);
+    } else {
+      console.error("getCabinPrice error:", error);
+    }
   }
 
   return data;
 }
 
-export const getCabins = async function () {
+export const getCabins = async function (): Promise<Cabin[]> {
   const { data, error } = await supabase
     .from("cabins")
     .select("id, name, max_capacity, regular_price, discount, image")
     .order("name");
 
   if (error) {
-    console.error("Error loading cabins:", error.message || error);
+    if (error instanceof Error) {
+      console.error("getCabins error:", error.message);
+    } else {
+      console.error("getCabins error:", error);
+    }
     throw new Error("Cabins could not be loaded");
   }
 
@@ -57,7 +116,7 @@ export const getCabins = async function () {
 };
 
 // Guests are uniquely identified by their email address
-export async function getGuest(email: string) {
+export async function getGuest(email: string): Promise<Guest | null> {
   const { data, error } = await supabase
     .from("guests")
     .select("*")
@@ -68,7 +127,7 @@ export async function getGuest(email: string) {
   return data;
 }
 
-export async function getBooking(id) {
+export async function getBooking(id: number): Promise<Booking> {
   const { data, error, count } = await supabase
     .from("bookings")
     .select("*")
@@ -76,14 +135,29 @@ export async function getBooking(id) {
     .single();
 
   if (error) {
-    console.error(error);
+    if (error instanceof Error) {
+      console.error("getBooking error:", error.message);
+    } else {
+      console.error("getBooking error:", error);
+    }
     throw new Error("Booking could not get loaded");
   }
 
   return data;
 }
 
-export async function getBookings(guestId) {
+export async function getBookings(guestId: number): Promise<Array<{
+  id: number;
+  created_at: string;
+  start_date: string;
+  end_date: string;
+  number_nights: number;
+  number_guests: number;
+  total_price: number;
+  guest_id: number;
+  cabin_id: number;
+  cabins: { name: string; image: string }[];
+}>> {
   const { data, error, count } = await supabase
     .from("bookings")
     // We actually also need data on the cabins as well. But let's ONLY take the data that we actually need, in order to reduce downloaded data.
@@ -94,27 +168,35 @@ export async function getBookings(guestId) {
     .order("start_date");
 
   if (error) {
-    console.error(error);
+    if (error instanceof Error) {
+      console.error("getBookings error:", error.message);
+    } else {
+      console.error("getBookings error:", error);
+    }
     throw new Error("Bookings could not get loaded");
   }
 
-  return data;
+  return data || [];
 }
 
-export async function getBookedDatesByCabinId(cabinId) {
-  let today = new Date();
+export async function getBookedDatesByCabinId(cabinId: number): Promise<Date[]> {
+  const today = new Date();
   today.setUTCHours(0, 0, 0, 0);
-  today = today.toISOString();
+  const todayISO = today.toISOString();
 
   // Getting all bookings
   const { data, error } = await supabase
     .from("bookings")
     .select("*")
     .eq("cabin_id", cabinId)
-    .or(`start_date.gte.${today},status.eq.checked-in`);
+    .or(`start_date.gte.${todayISO},status.eq.checked-in`);
 
   if (error) {
-    console.error(error);
+    if (error instanceof Error) {
+      console.error("getBookedDatesByCabinId error:", error.message);
+    } else {
+      console.error("getBookedDatesByCabinId error:", error);
+    }
     throw new Error("Bookings could not get loaded");
   }
 
@@ -131,18 +213,22 @@ export async function getBookedDatesByCabinId(cabinId) {
   return bookedDates;
 }
 
-export async function getSettings() {
+export async function getSettings(): Promise<Settings> {
   const { data, error } = await supabase.from("settings").select("*").single();
 
   if (error) {
-    console.error(error);
+    if (error instanceof Error) {
+      console.error("getSettings error:", error.message);
+    } else {
+      console.error("getSettings error:", error);
+    }
     throw new Error("Settings could not be loaded");
   }
 
   return data;
 }
 
-export async function getCountries() {
+export async function getCountries(): Promise<Country[]> {
   try {
     const res = await fetch(
       "https://restcountries.com/v2/all?fields=name,flag",
@@ -157,18 +243,22 @@ export async function getCountries() {
 /////////////
 // CREATE
 
-export async function createGuest(newGuest) {
+export async function createGuest(newGuest: Omit<Guest, 'id'>): Promise<Guest[]> {
   const { data, error } = await supabase.from("guests").insert([newGuest]);
 
   if (error) {
-    console.error(error);
+    if (error instanceof Error) {
+      console.error("createGuest error:", error.message);
+    } else {
+      console.error("createGuest error:", error);
+    }
     throw new Error("Guest could not be created");
   }
 
-  return data;
+  return data || [];
 }
 
-export async function createBooking(newBooking) {
+export async function createBooking(newBooking: Omit<Booking, 'id' | 'created_at'>): Promise<Booking> {
   const { data, error } = await supabase
     .from("bookings")
     .insert([newBooking])
@@ -177,7 +267,11 @@ export async function createBooking(newBooking) {
     .single();
 
   if (error) {
-    console.error(error);
+    if (error instanceof Error) {
+      console.error("createBooking error:", error.message);
+    } else {
+      console.error("createBooking error:", error);
+    }
     throw new Error("Booking could not be created");
   }
 
@@ -188,7 +282,7 @@ export async function createBooking(newBooking) {
 // UPDATE
 
 // The updatedFields is an object which should ONLY contain the updated data
-export async function updateGuest(id, updatedFields) {
+export async function updateGuest(id: number, updatedFields: Partial<Guest>): Promise<Guest> {
   const { data, error } = await supabase
     .from("guests")
     .update(updatedFields)
@@ -197,13 +291,17 @@ export async function updateGuest(id, updatedFields) {
     .single();
 
   if (error) {
-    console.error(error);
+    if (error instanceof Error) {
+      console.error("updateGuest error:", error.message);
+    } else {
+      console.error("updateGuest error:", error);
+    }
     throw new Error("Guest could not be updated");
   }
   return data;
 }
 
-export async function updateBooking(id, updatedFields) {
+export async function updateBooking(id: number, updatedFields: Partial<Booking>): Promise<Booking> {
   const { data, error } = await supabase
     .from("bookings")
     .update(updatedFields)
@@ -212,7 +310,11 @@ export async function updateBooking(id, updatedFields) {
     .single();
 
   if (error) {
-    console.error(error);
+    if (error instanceof Error) {
+      console.error("updateBooking error:", error.message);
+    } else {
+      console.error("updateBooking error:", error);
+    }
     throw new Error("Booking could not be updated");
   }
   return data;
@@ -221,11 +323,15 @@ export async function updateBooking(id, updatedFields) {
 /////////////
 // DELETE
 
-export async function deleteBooking(id) {
+export async function deleteBooking(id: number): Promise<{ id: number } | null> {
   const { data, error } = await supabase.from("bookings").delete().eq("id", id);
 
   if (error) {
-    console.error(error);
+    if (error instanceof Error) {
+      console.error("deleteBooking error:", error.message);
+    } else {
+      console.error("deleteBooking error:", error);
+    }
     throw new Error("Booking could not be deleted");
   }
   return data;
