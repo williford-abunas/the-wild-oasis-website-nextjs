@@ -1,0 +1,89 @@
+"use client";
+
+import { useState } from "react";
+import DateSelector from "./DateSelector";
+import ReservationForm from "./ReservationForm";
+
+interface PricingData {
+  regularPrice: number;
+  discount: number;
+  numNights: number;
+  cabinPrice: number;
+  selectedRange: { from: Date | null; to: Date | null };
+}
+
+export default function ReservationSection() {
+  const [pricing, setPricing] = useState<PricingData>({
+    regularPrice: 23,
+    discount: 23,
+    numNights: 0,
+    cabinPrice: 0,
+    selectedRange: { from: null, to: null }
+  });
+
+  const handlePricingChange = (newPricing: PricingData) => {
+    setPricing(newPricing);
+  };
+
+  const resetRange = () => {
+    setPricing(prev => ({
+      ...prev,
+      numNights: 0,
+      cabinPrice: 0,
+      selectedRange: { from: null, to: null }
+    }));
+  };
+
+  return (
+    <div className="border border-primary-800">
+      <div className="grid grid-cols-[1fr_1fr] min-h-[400px]">
+        <div className="border-r border-primary-800 h-full">
+          <DateSelector onPricingChange={handlePricingChange} />
+        </div>
+        <div className="h-full">
+          <ReservationForm />
+        </div>
+      </div>
+      <div className="border-t border-primary-800 bg-accent-500 text-primary-800 px-8 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-baseline gap-6">
+            <p className="flex gap-2 items-baseline">
+              {pricing.discount > 0 ? (
+                <>
+                  <span className="text-2xl font-bold">${pricing.regularPrice - pricing.discount}</span>
+                  <span className="line-through font-semibold text-primary-700">
+                    ${pricing.regularPrice}
+                  </span>
+                </>
+              ) : (
+                <span className="text-2xl font-bold">${pricing.regularPrice}</span>
+              )}
+              <span className="text-sm">/night</span>
+            </p>
+            {pricing.numNights > 0 && (
+              <div className="flex gap-5 items-baseline">
+                <p className="bg-accent-600 px-3 py-2 text-xl rounded">
+                  <span>&times;</span> <span>{pricing.numNights}</span>
+                </p>
+                <p>
+                  <span className="text-lg font-bold uppercase">Total</span>{" "}
+                  <span className="text-2xl font-semibold">${pricing.cabinPrice}</span>
+                </p>
+              </div>
+            )}
+          </div>
+          <div className="flex gap-4 min-h-[40px] items-center">
+            {(pricing.selectedRange.from || pricing.selectedRange.to) && (
+              <button
+                className="border border-primary-800 py-2 px-4 text-sm font-semibold rounded hover:bg-primary-800 hover:text-accent-400 transition-colors"
+                onClick={resetRange}
+              >
+                Clear
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
