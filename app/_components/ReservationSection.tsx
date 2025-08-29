@@ -38,7 +38,10 @@ export default function ReservationSection() {
     <div className="border border-primary-800">
       <div className="grid grid-cols-[1.1fr_0.9fr] min-h-[400px]">
         <div className="border-r border-primary-800 h-full">
-          <DateSelector onPricingChange={handlePricingChange} />
+          <DateSelector 
+            onPricingChange={handlePricingChange} 
+            selectedRange={pricing.selectedRange}
+          />
         </div>
         <div className="h-full">
           <ReservationForm />

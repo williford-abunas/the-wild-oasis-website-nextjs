@@ -11,11 +11,19 @@ interface DateSelectorProps {
     cabinPrice: number;
     selectedRange: { from: Date | null; to: Date | null };
   }) => void;
+  selectedRange?: { from: Date | null; to: Date | null };
 }
 
-const DateSelector = ({ onPricingChange }: DateSelectorProps) => {
+const DateSelector = ({ onPricingChange, selectedRange: propSelectedRange }: DateSelectorProps) => {
   const [selectedRange, setSelectedRange] = useState<{ from: Date | null; to: Date | null }>({ from: null, to: null });
   const [currentDate, setCurrentDate] = useState(new Date());
+  
+  // Sync local state with prop when it changes (e.g., when resetRange is called)
+  React.useEffect(() => {
+    if (propSelectedRange) {
+      setSelectedRange(propSelectedRange);
+    }
+  }, [propSelectedRange]);
   
   // Mock data
   const regularPrice = 23;
