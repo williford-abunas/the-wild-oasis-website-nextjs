@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import DateSelector from "./DateSelector";
 import ReservationForm from "./ReservationForm";
 
@@ -21,9 +21,9 @@ export default function ReservationSection() {
     selectedRange: { from: null, to: null }
   });
 
-  const handlePricingChange = (newPricing: PricingData) => {
+  const handlePricingChange = useCallback((newPricing: PricingData) => {
     setPricing(newPricing);
-  };
+  }, []);
 
   const resetRange = () => {
     setPricing(prev => ({
@@ -36,7 +36,7 @@ export default function ReservationSection() {
 
   return (
     <div className="border border-primary-800">
-      <div className="grid grid-cols-[1fr_1fr] min-h-[400px]">
+      <div className="grid grid-cols-[1.1fr_0.9fr] min-h-[400px]">
         <div className="border-r border-primary-800 h-full">
           <DateSelector onPricingChange={handlePricingChange} />
         </div>

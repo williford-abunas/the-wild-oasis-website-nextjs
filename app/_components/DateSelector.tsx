@@ -93,6 +93,16 @@ const DateSelector = ({ onPricingChange }: DateSelectorProps) => {
            (selectedRange.to && date.getTime() === selectedRange.to.getTime());
   };
 
+  const isStartDate = (date: Date | null) => {
+    if (!date || !selectedRange.from) return false;
+    return date.getTime() === selectedRange.from.getTime();
+  };
+
+  const isEndDate = (date: Date | null) => {
+    if (!date || !selectedRange.to) return false;
+    return date.getTime() === selectedRange.to.getTime();
+  };
+
   const isDateDisabled = (date: Date | null) => {
     if (!date) return true;
     const today = new Date();
@@ -113,31 +123,29 @@ const DateSelector = ({ onPricingChange }: DateSelectorProps) => {
 
     return (
       <div className="flex-1">
-        <div className="flex items-center justify-between mb-4">
+        <div className="relative flex items-center mb-4 border-b border-primary-800">
           {monthOffset === 0 && (
             <button
               onClick={() => navigateMonth(-1)}
-              className="p-2 text-accent-400 hover:bg-primary-800 rounded"
+              className="p-2 text-accent-400 hover:bg-primary-800 rounded z-10"
             >
               <ChevronLeft size={20} />
             </button>
           )}
-          <h3 className="text-accent-400 font-semibold w-32 text-center">
+          <h3 className="absolute left-1/2 transform -translate-x-1/2 text-accent-400 font-semibold text-center">
             {months[displayDate.getMonth()]} {displayDate.getFullYear()}
           </h3>
           {monthOffset === 1 && (
             <button
               onClick={() => navigateMonth(1)}
-              className="p-2 text-accent-400 hover:bg-primary-800 rounded"
+              className="p-2 text-accent-400 hover:bg-primary-800 rounded z-10 ml-auto"
             >
               <ChevronRight size={20} />
             </button>
           )}
-          {monthOffset === 0 && <div className="w-9"></div>}
-          {monthOffset === 1 && <div className="w-9"></div>}
         </div>
         
-        <div className="grid grid-cols-7 gap-0.5 mb-2">
+        <div className="grid grid-cols-7 gap-0 mb-2">
           {daysOfWeek.map(day => (
             <div key={day} className="text-primary-400 text-sm font-medium text-center py-2">
               {day}
@@ -145,32 +153,54 @@ const DateSelector = ({ onPricingChange }: DateSelectorProps) => {
           ))}
         </div>
         
-        <div className="grid grid-cols-7 gap-0.5">
-          {days.map((date, index) => (
-            <button
-              key={index}
-              onClick={() => handleDateClick(date)}
-              disabled={isDateDisabled(date)}
-              className={`
-                h-9 w-9 rounded text-sm font-medium transition-colors
-                ${!date ? 'invisible' : ''}
-                ${isDateDisabled(date) 
-                  ? 'text-primary-500 cursor-not-allowed' 
-                  : 'text-primary-100 hover:bg-primary-700'
-                }
-                ${isDateSelected(date) 
-                  ? 'bg-accent-500 text-primary-900' 
-                  : ''
-                }
-                ${isDateInRange(date) && !isDateSelected(date)
-                  ? 'bg-accent-500/20 text-primary-100'
-                  : ''
-                }
-              `}
-            >
-              {date ? date.getDate() : ''}
-            </button>
-          ))}
+        <div className="grid grid-cols-7 gap-0">
+          {days.map((date, index) => {
+            const dayOfWeek = index % 7;
+            const isFirstInRow = dayOfWeek === 0;
+            const isLastInRow = dayOfWeek === 6;
+            
+            return (
+              <div key={index} className="relative">
+                {/* Background highlight for range */}
+                {isDateInRange(date) && !isDateSelected(date) && (
+                  <div 
+                    className={`
+                      absolute h-9 w-9 bg-accent-500/20
+                      ${isFirstInRow ? 'rounded-l-full' : ''}
+                      ${isLastInRow ? 'rounded-r-full' : ''}
+                    `}
+                  />
+                )}
+                
+                {/* Continuous background for start/end dates */}
+                {isStartDate(date) && selectedRange.to && (
+                  <div className="absolute h-9 w-9 bg-accent-500/20 rounded-l-full z-10" />
+                )}
+                {isEndDate(date) && selectedRange.from && (
+                  <div className="absolute h-9 w-9 bg-accent-500/20 rounded-r-full z-10" />
+                )}
+                
+                <button
+                  onClick={() => handleDateClick(date)}
+                  disabled={isDateDisabled(date)}
+                  className={`
+                    relative h-9 w-9 text-sm font-medium transition-colors z-10
+                    ${!date ? 'invisible' : ''}
+                    ${isDateDisabled(date) 
+                      ? 'text-primary-500 cursor-not-allowed' 
+                      : 'text-primary-100 hover:bg-primary-700'
+                    }
+                    ${isDateSelected(date) 
+                      ? 'bg-accent-500 text-primary-900 rounded-full' 
+                      : ''
+                    }
+                  `}
+                >
+                  {date ? date.getDate() : ''}
+                </button>
+              </div>
+            );
+          })}
         </div>
       </div>
     );
