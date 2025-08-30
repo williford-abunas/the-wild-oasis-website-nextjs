@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
 import DateSelector from "./DateSelector";
 import ReservationForm from "./ReservationForm";
+import { Cabin } from "../_lib/types";
 
 interface PricingData {
   regularPrice: number;
@@ -12,10 +13,11 @@ interface PricingData {
   selectedRange: { from: Date | null; to: Date | null };
 }
 
-export default function ReservationSection() {
+export default function ReservationSection({cabin}: {cabin: Cabin}) {
+  console.log(cabin);
   const [pricing, setPricing] = useState<PricingData>({
-    regularPrice: 23,
-    discount: 23,
+    regularPrice: cabin.regular_price,
+    discount: cabin.discount,
     numNights: 0,
     cabinPrice: 0,
     selectedRange: { from: null, to: null }
@@ -44,7 +46,7 @@ export default function ReservationSection() {
           />
         </div>
         <div className="h-full">
-          <ReservationForm />
+          <ReservationForm cabin={cabin} pricing={pricing} onPricingChange={handlePricingChange} numGuests={pricing.numNights}/>
         </div>
       </div>
       <div className="border-t border-primary-800 bg-accent-500 text-primary-800 px-8 py-4">

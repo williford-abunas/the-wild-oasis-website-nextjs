@@ -90,7 +90,7 @@ export default async function Page({ params }: Props) {
         <h2 className="text-2xl sm:text-3xl lg:text-5xl font-semibold text-center px-4 mb-10 text-accent-400">
           Reserve Cabin {name} today. Pay on arrival.
         </h2>
-        <ReservationSection />
+        <ReservationSection cabin={cabin}/>
       </div>
     </div>
   );

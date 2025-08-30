@@ -1,4 +1,4 @@
-function ReservationForm() {
+function ReservationForm({cabin, pricing, onPricingChange, numGuests}: {cabin: Cabin, pricing: PricingData, onPricingChange: (pricing: PricingData) => void, numGuests: number}) {
   // CHANGE
   const maxCapacity = 23;
 
