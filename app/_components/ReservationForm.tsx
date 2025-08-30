@@ -1,6 +1,8 @@
-function ReservationForm({cabin, pricing, onPricingChange, numGuests}: {cabin: Cabin, pricing: PricingData, onPricingChange: (pricing: PricingData) => void, numGuests: number}) {
-  // CHANGE
-  const maxCapacity = 23;
+import { Cabin } from "../_lib/types";
+
+function ReservationForm({cabin}: {cabin: Cabin}) {
+  const maxCapacity = cabin.max_capacity;
+ 
 
   return (
     <div>

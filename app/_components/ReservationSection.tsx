@@ -1,52 +1,24 @@
 "use client";
 
-import { useCallback, useState } from "react";
 import DateSelector from "./DateSelector";
 import ReservationForm from "./ReservationForm";
 import { Cabin } from "../_lib/types";
+import { useReservation } from "../_context/ReservationContext";
 
-interface PricingData {
-  regularPrice: number;
-  discount: number;
-  numNights: number;
-  cabinPrice: number;
-  selectedRange: { from: Date | null; to: Date | null };
-}
-
-export default function ReservationSection({cabin}: {cabin: Cabin}) {
-  console.log(cabin);
-  const [pricing, setPricing] = useState<PricingData>({
-    regularPrice: cabin.regular_price,
-    discount: cabin.discount,
-    numNights: 0,
-    cabinPrice: 0,
-    selectedRange: { from: null, to: null }
-  });
-
-  const handlePricingChange = useCallback((newPricing: PricingData) => {
-    setPricing(newPricing);
-  }, []);
-
-  const resetRange = () => {
-    setPricing(prev => ({
-      ...prev,
-      numNights: 0,
-      cabinPrice: 0,
-      selectedRange: { from: null, to: null }
-    }));
-  };
+export default function ReservationSection({ cabin }: { cabin: Cabin }) {
+  const { range, calculatePricing, resetRange } = useReservation();
+  const pricing = calculatePricing(cabin);
 
   return (
     <div className="border border-primary-800">
       <div className="grid grid-cols-[1.1fr_0.9fr] min-h-[400px]">
         <div className="border-r border-primary-800 h-full">
-          <DateSelector 
-            onPricingChange={handlePricingChange} 
-            selectedRange={pricing.selectedRange}
-          />
+          <DateSelector />
         </div>
         <div className="h-full">
-          <ReservationForm cabin={cabin} pricing={pricing} onPricingChange={handlePricingChange} numGuests={pricing.numNights}/>
+          <ReservationForm 
+            cabin={cabin} 
+          />
         </div>
       </div>
       <div className="border-t border-primary-800 bg-accent-500 text-primary-800 px-8 py-4">
@@ -78,7 +50,7 @@ export default function ReservationSection({cabin}: {cabin: Cabin}) {
             )}
           </div>
           <div className="flex gap-4 min-h-[40px] items-center">
-            {(pricing.selectedRange.from || pricing.selectedRange.to) && (
+            {(range.from || range.to) && (
               <button
                 className="border border-primary-800 py-2 px-4 text-sm font-semibold rounded hover:bg-primary-800 hover:text-accent-400 transition-colors"
                 onClick={resetRange}

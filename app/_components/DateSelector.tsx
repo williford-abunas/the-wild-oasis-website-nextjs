@@ -2,49 +2,13 @@
 
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useReservation } from '../_context/ReservationContext';
 
-interface DateSelectorProps {
-  onPricingChange?: (pricing: {
-    regularPrice: number;
-    discount: number;
-    numNights: number;
-    cabinPrice: number;
-    selectedRange: { from: Date | null; to: Date | null };
-  }) => void;
-  selectedRange?: { from: Date | null; to: Date | null };
-}
-
-const DateSelector = ({ onPricingChange, selectedRange: propSelectedRange }: DateSelectorProps) => {
-  const [selectedRange, setSelectedRange] = useState<{ from: Date | null; to: Date | null }>({ from: null, to: null });
+const DateSelector = () => {
+  const { range, setRange } = useReservation();
   const [currentDate, setCurrentDate] = useState(new Date());
   
-  // Sync local state with prop when it changes (e.g., when resetRange is called)
-  React.useEffect(() => {
-    if (propSelectedRange) {
-      setSelectedRange(propSelectedRange);
-    }
-  }, [propSelectedRange]);
-  
-  // Mock data
-  const regularPrice = 23;
-  const discount = 23;
-  const numNights = selectedRange.from && selectedRange.to 
-    ? Math.ceil((selectedRange.to.getTime() - selectedRange.from.getTime()) / (1000 * 60 * 60 * 24))
-    : 0;
-  const cabinPrice = numNights * (regularPrice - discount);
 
-  // Notify parent of pricing changes
-  React.useEffect(() => {
-    if (onPricingChange) {
-      onPricingChange({
-        regularPrice,
-        discount,
-        numNights,
-        cabinPrice,
-        selectedRange
-      });
-    }
-  }, [regularPrice, discount, numNights, cabinPrice, selectedRange, onPricingChange]);
 
   const months = [
     'January', 'February', 'March', 'April', 'May', 'June',
@@ -81,34 +45,34 @@ const DateSelector = ({ onPricingChange, selectedRange: propSelectedRange }: Dat
     today.setHours(0, 0, 0, 0);
     if (!date || date < today) return;
 
-    if (!selectedRange.from || (selectedRange.from && selectedRange.to)) {
-      setSelectedRange({ from: date, to: null });
-    } else if (selectedRange.from && date < selectedRange.from) {
-      setSelectedRange({ from: date, to: selectedRange.from });
+    if (!range.from || (range.from && range.to)) {
+      setRange({ from: date, to: null });
+    } else if (range.from && date < range.from) {
+      setRange({ from: date, to: range.from });
     } else {
-      setSelectedRange({ ...selectedRange, to: date });
+      setRange({ ...range, to: date });
     }
   };
 
   const isDateInRange = (date: Date | null) => {
-    if (!date || !selectedRange.from || !selectedRange.to) return false;
-    return date >= selectedRange.from && date <= selectedRange.to;
+    if (!date || !range.from || !range.to) return false;
+    return date >= range.from && date <= range.to;
   };
 
   const isDateSelected = (date: Date | null) => {
     if (!date) return false;
-    return (selectedRange.from && date.getTime() === selectedRange.from.getTime()) ||
-           (selectedRange.to && date.getTime() === selectedRange.to.getTime());
+    return (range.from && date.getTime() === range.from.getTime()) ||
+           (range.to && date.getTime() === range.to.getTime());
   };
 
   const isStartDate = (date: Date | null) => {
-    if (!date || !selectedRange.from) return false;
-    return date.getTime() === selectedRange.from.getTime();
+    if (!date || !range.from) return false;
+    return date.getTime() === range.from.getTime();
   };
 
   const isEndDate = (date: Date | null) => {
-    if (!date || !selectedRange.to) return false;
-    return date.getTime() === selectedRange.to.getTime();
+    if (!date || !range.to) return false;
+    return date.getTime() === range.to.getTime();
   };
 
   const isDateDisabled = (date: Date | null) => {
@@ -181,10 +145,10 @@ const DateSelector = ({ onPricingChange, selectedRange: propSelectedRange }: Dat
                 )}
                 
                 {/* Continuous background for start/end dates */}
-                {isStartDate(date) && selectedRange.to && (
+                {isStartDate(date) && range.to && (
                   <div className="absolute h-9 w-9 bg-accent-500/20 rounded-l-full z-10" />
                 )}
-                {isEndDate(date) && selectedRange.from && (
+                {isEndDate(date) && range.from && (
                   <div className="absolute h-9 w-9 bg-accent-500/20 rounded-r-full z-10" />
                 )}
                 
@@ -214,9 +178,7 @@ const DateSelector = ({ onPricingChange, selectedRange: propSelectedRange }: Dat
     );
   };
 
-  const resetRange = () => {
-    setSelectedRange({ from: null, to: null });
-  };
+
 
   return (
     <div className="bg-primary-900 text-primary-100 h-full">
