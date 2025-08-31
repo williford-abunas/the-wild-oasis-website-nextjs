@@ -3,10 +3,14 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useReservation } from '../_context/ReservationContext';
+import { Settings } from '../_lib/types';
+import { Cabin } from '../_lib/types';
 
-const DateSelector = () => {
+const DateSelector = ({ settings, bookedDates, cabin }: { settings: Settings, bookedDates: Date[], cabin: Cabin }) => {
   const { range, setRange } = useReservation();
   const [currentDate, setCurrentDate] = useState(new Date());
+  // const minBookingLength = settings.min_booking_length;
+  // const maxBookingLength = settings.max_booking_length;
 
   // Auto-scroll to selected dates when component mounts or range changes
   useEffect(() => {

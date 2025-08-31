@@ -4,6 +4,8 @@ import { Cabin } from "@/app/_lib/types";
 import Image from "next/image";
 import TextExpander from "@/app/_components/TextExpander";
 import ReservationSection from "@/app/_components/ReservationSection";
+import { Suspense } from "react";
+import Spinner from "@/app/_components/Spinner";
 
 type Props = {
   params: Promise<{ cabinId: string }>;
@@ -90,7 +92,7 @@ export default async function Page({ params }: Props) {
         <h2 className="text-2xl sm:text-3xl lg:text-5xl font-semibold text-center px-4 mb-10 text-accent-400">
           Reserve Cabin {name} today. Pay on arrival.
         </h2>
-        <ReservationSection cabin={cabin}/>
+          <ReservationSection cabin={cabin}/>
       </div>
     </div>
   );
