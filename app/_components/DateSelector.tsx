@@ -1,14 +1,48 @@
 "use client"
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useReservation } from '../_context/ReservationContext';
 
 const DateSelector = () => {
   const { range, setRange } = useReservation();
   const [currentDate, setCurrentDate] = useState(new Date());
-  
 
+  // Auto-scroll to selected dates when component mounts or range changes
+  useEffect(() => {
+    if (range.from) {
+      let newCurrentDate: Date;
+      
+      if (range.to && shouldAdjustCalendarPosition()) {
+        // If range spans multiple months, position to show the start date
+        // The end date will be visible in the right column if it's the next month
+        newCurrentDate = new Date(range.from);
+      } else {
+        // Otherwise, just show the start date
+        newCurrentDate = new Date(range.from);
+      }
+      
+      setCurrentDate(newCurrentDate);
+    } else if (!range.from && !range.to) {
+      // If both from and to are null (range cleared), force reset to current month
+      const today = new Date();
+      setCurrentDate(today);
+    }
+  }, [range.from, range.to]);
+
+  // Function to check if we need to adjust calendar position to show the entire range
+  const shouldAdjustCalendarPosition = () => {
+    if (!range.from || !range.to) return false;
+    
+    const startMonth = range.from.getMonth();
+    const endMonth = range.to.getMonth();
+    const startYear = range.from.getFullYear();
+    const endYear = range.to.getFullYear();
+    
+    // Check if range spans multiple months
+    const monthDiff = (endYear - startYear) * 12 + (endMonth - startMonth);
+    return monthDiff > 1;
+  };
 
   const months = [
     'January', 'February', 'March', 'April', 'May', 'June',
@@ -88,9 +122,21 @@ const DateSelector = () => {
     setCurrentDate(newDate);
   };
 
+  // Ensure we always show consecutive months
+  const getLeftMonthDate = () => currentDate;
+  const getRightMonthDate = () => {
+    // Always set to the 1st of the next month to avoid date rollover issues
+    const rightDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
+    return rightDate;
+  };
+
+
+
+
+
   const renderMonth = (monthOffset = 0) => {
-    const displayDate = new Date(currentDate);
-    displayDate.setMonth(currentDate.getMonth() + monthOffset);
+    // Use helper functions to ensure consecutive months
+    const displayDate = monthOffset === 0 ? getLeftMonthDate() : getRightMonthDate();
     const days = getDaysInMonth(displayDate);
 
     return (
