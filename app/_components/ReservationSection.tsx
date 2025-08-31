@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import DateSelector from "./DateSelector";
 import ReservationForm from "./ReservationForm";
 import { Cabin } from "../_lib/types";
@@ -7,6 +8,14 @@ import { useReservation } from "../_context/ReservationContext";
 
 export default function ReservationSection({ cabin }: { cabin: Cabin }) {
   const { range, calculatePricing, resetRange } = useReservation();
+  
+  // Clear any existing dates when component first loads (to prevent stale dates from previous navigation)
+  useEffect(() => {
+    if (range.from || range.to) {
+      resetRange();
+    }
+  }, []); // Empty dependency array means this only runs once on mount
+  
   const pricing = calculatePricing(cabin);
 
   return (
