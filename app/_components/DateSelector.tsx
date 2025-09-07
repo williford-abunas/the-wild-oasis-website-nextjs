@@ -6,7 +6,7 @@ import { useReservation } from '../_context/ReservationContext';
 import { Settings } from '../_lib/types';
 import { Cabin } from '../_lib/types';
 
-const DateSelector = ({ }: { settings: Settings, bookedDates: Date[], cabin: Cabin }) => {
+const DateSelector = ({ settings, bookedDates, cabin }: { settings: Settings, bookedDates: Date[], cabin: Cabin }) => {
   const { range, setRange } = useReservation();
   const [currentDate, setCurrentDate] = useState(new Date());
   // const minBookingLength = settings.min_booking_length;
