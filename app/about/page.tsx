@@ -2,7 +2,6 @@ import Image from "next/image";
 import img1 from "@/public/about-1.jpg";
 import img2 from "@/public/about-2.jpg";
 import Link from "next/link";
-import { getCabins } from "@/app/_lib/data-service";
 
 export const metadata = {
   title: "About",

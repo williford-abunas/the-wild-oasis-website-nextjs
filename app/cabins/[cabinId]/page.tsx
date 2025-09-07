@@ -4,8 +4,6 @@ import { Cabin } from "@/app/_lib/types";
 import Image from "next/image";
 import TextExpander from "@/app/_components/TextExpander";
 import ReservationSection from "@/app/_components/ReservationSection";
-import { Suspense } from "react";
-import Spinner from "@/app/_components/Spinner";
 
 type Props = {
   params: Promise<{ cabinId: string }>;
@@ -31,11 +29,8 @@ export default async function Page({ params }: Props) {
   const { cabinId } = await params;
   const cabin: Cabin = await getCabin(Number(cabinId));
   const {
-    id,
     name,
     max_capacity: maxCapacity,
-    regular_price: regularPrice,
-    discount,
     image,
     description,
   } = cabin;
@@ -97,3 +92,4 @@ export default async function Page({ params }: Props) {
     </div>
   );
 }
+
