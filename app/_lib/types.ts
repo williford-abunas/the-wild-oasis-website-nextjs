@@ -88,3 +88,10 @@ export type CreateBookingData = Omit<Booking, 'id' | 'created_at'>;
 // Partial types for updates
 export type UpdateGuestData = Partial<Guest>;
 export type UpdateBookingData = Partial<Booking>;
+
+export type User = {
+  id: string;
+  name: string;
+  email: string;
+  image: string;
+};

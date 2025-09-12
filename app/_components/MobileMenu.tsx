@@ -6,7 +6,7 @@ import Navigation from "@/app/_components/Navigation";
 interface MobileMenuProps {
   session?: {
     user?: {
-      image?: string;
+      image?: string | null;
     };
   } | null;
 }
