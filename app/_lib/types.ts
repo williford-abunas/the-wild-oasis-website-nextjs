@@ -82,7 +82,13 @@ export interface ReservationCardBooking {
 }
 
 // Utility types for creating new records
-export type CreateGuestData = Omit<Guest, 'id'>;
+export type CreateGuestData = {
+  email: string;
+  full_name: string;
+  national_id?: string;
+  nationality?: string;
+  country_flag?: string;
+};
 export type CreateBookingData = Omit<Booking, 'id' | 'created_at'>;
 
 // Partial types for updates
