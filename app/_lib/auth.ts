@@ -30,6 +30,9 @@ const authConfig: NextAuthConfig = {
             return token;
         },
     },
+    pages: {
+        signIn: "/login",
+    },
 }
 
 export const { handlers: { GET, POST }, signIn, signOut, auth } = NextAuth(authConfig);

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "@/app/_styles/globals.css";
+import { ReservationProvider } from "./_context/ReservationContext";
 
 import { Josefin_Sans } from "next/font/google";
 
@@ -24,7 +25,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${josefinSans.className} antialiased bg-primary-950 text-primary-50 min-h-screen flex flex-col`}>
-       {children}
+        <ReservationProvider>
+          {children}
+        </ReservationProvider>
       </body>
     </html>
   );
