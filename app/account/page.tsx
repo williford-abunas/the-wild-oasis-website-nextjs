@@ -1,12 +1,18 @@
 import { Metadata } from "next";
+import { auth } from "../_lib/auth";
 
 export const metadata: Metadata = {
   title: "Account",
   description: "Account page",
 };
 
-export default function Page() {
+export default async function Page() {
+  const session = await auth();
   return (
-    <h1>Account page</h1>
+    <>
+    <h2 className="font-semibold text-2xl text-accent-400 mb-7">
+        Welcome, {session?.user?.name?.split(" ")[0]}!
+      </h2>
+    </>
   );
 }

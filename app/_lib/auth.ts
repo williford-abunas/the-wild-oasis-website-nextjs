@@ -11,6 +11,10 @@ const authConfig: NextAuthConfig = {
         }),
     ],
     callbacks: {
+      authorized({auth}) {
+    
+        return !!auth?.user;
+      },
         async session({ session, token }: { session: Session; token: JWT }) {
             // Ensure user image is included in session
             if (token?.picture && session.user) {
