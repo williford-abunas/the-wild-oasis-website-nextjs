@@ -4,8 +4,6 @@ import { Cabin } from "@/app/_lib/types";
 import Image from "next/image";
 import TextExpander from "@/app/_components/TextExpander";
 import ReservationSection from "@/app/_components/ReservationSection";
-import { Suspense } from "react";
-import Spinner from "@/app/_components/Spinner";
 
 type Props = {
   params: Promise<{ cabinId: string }>;

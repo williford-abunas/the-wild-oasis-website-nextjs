@@ -9,6 +9,8 @@ export const metadata = {
   title: "Cabins",
 };
 
+
+
 export default function Page({searchParams}: {searchParams: { [key: string]: string | string[] | undefined }}) {
 
   const { capacity } = searchParams;
