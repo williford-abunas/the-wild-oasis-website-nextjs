@@ -8,6 +8,7 @@ type Country = {
 
 type SelectCountryProps = {
   defaultCountry: string;
+  defaultFlag: string;
   name: string;
   id: string;
   className?: string;
@@ -15,20 +16,18 @@ type SelectCountryProps = {
 
 async function SelectCountry({
   defaultCountry,
+  defaultFlag,
   name,
   id,
   className,
 }: SelectCountryProps) {
   const countries: Country[] = await getCountries();
-  const flag =
-    countries.find((country) => country.name === defaultCountry)?.flag ?? "";
 
   return (
     <select
       name={name}
       id={id}
-      // Here we use a trick to encode BOTH the country name and the flag into the value. Then we split them up again later in the server action
-      defaultValue={`${defaultCountry}%${flag}`}
+      defaultValue={`${defaultCountry}%${defaultFlag}`}
       className={className}
     >
       <option value="">Select country...</option>

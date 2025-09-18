@@ -184,6 +184,9 @@ export async function getCountries(): Promise<Country[]> {
   try {
     const res = await fetch(
       "https://restcountries.com/v2/all?fields=name,flag",
+      {
+        cache: 'no-store' // Disable caching to ensure fresh data
+      }
     );
     const countries = await res.json();
     return countries;
