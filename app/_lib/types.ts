@@ -61,7 +61,8 @@ export interface BookingWithCabin {
   total_price: number;
   guest_id: number;
   cabin_id: number;
-  cabins: { name: string; image: string }[];
+  status: string;
+  cabins: { name: string; image: string };
 }
 
 // Type for ReservationCard component (matches the existing structure)

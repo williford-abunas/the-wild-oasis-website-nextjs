@@ -1,29 +1,33 @@
 import ReservationCard from "@/app/_components/ReservationCard";
+import { auth } from "@/app/_lib/auth";
+import { getBookings } from "@/app/_lib/data-service";
+import { ReservationCardBooking } from "@/app/_lib/types";
 import Link from "next/link";
 
 export const metadata = {
   title: "Reservations",
 };
 
-type Booking = {
-  id: number;
-  guestId: number;
-  startDate: string;
-  endDate: string;
-  numNights: number;
-  totalPrice: number;
-  numGuests: number;
-  status: string;
-  created_at: string;
-  cabins: {
-    name: string;
-    image: string;
-  };
-};
-
-export default function Page() {
-  // CHANGE
-  const bookings: Booking[] = [];
+export default async function Page() {
+  const session = await auth();
+  const dbBookings = await getBookings(Number(session?.user?.guestId) ?? 0);
+  
+  // Transform database format to component format
+  const bookings: ReservationCardBooking[] = dbBookings.map(booking => ({
+    id: booking.id,
+    guestId: booking.guest_id,
+    startDate: booking.start_date,
+    endDate: booking.end_date,
+    numNights: booking.number_nights,
+    totalPrice: booking.total_price,
+    numGuests: booking.number_guests,
+    status: booking.status,
+    created_at: booking.created_at,
+    cabins: {
+      name: booking.cabins?.name || 'Unknown Cabin',
+      image: booking.cabins?.image || '/logo.png'
+    }
+  }));
 
   return (
     <div>

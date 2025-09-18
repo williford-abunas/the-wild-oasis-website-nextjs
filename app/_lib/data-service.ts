@@ -114,7 +114,7 @@ export async function getBookings(guestId: number): Promise<BookingWithCabin[]> 
     .from("bookings")
     // We actually also need data on the cabins as well. But let's ONLY take the data that we actually need, in order to reduce downloaded data.
     .select(
-      "id, created_at, start_date, end_date, number_nights, number_guests, total_price, guest_id, cabin_id, cabins(name, image)",
+      "id, created_at, start_date, end_date, number_nights, number_guests, total_price, guest_id, cabin_id, status, cabins(name, image)",
     )
     .eq("guest_id", guestId)
     .order("start_date");
