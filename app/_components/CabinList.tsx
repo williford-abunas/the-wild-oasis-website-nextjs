@@ -5,6 +5,7 @@ import { getCabins } from "@/app/_lib/data-service";
 async function CabinList({filter}: {filter: string | string[] | undefined}) {
 
   const cabins = await getCabins();
+  console.log(cabins);
 
   let filteredCabins: Cabin[] = [];
 

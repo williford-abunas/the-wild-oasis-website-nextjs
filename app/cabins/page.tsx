@@ -11,9 +11,9 @@ export const metadata = {
 
 
 
-export default function Page({searchParams}: {searchParams: { [key: string]: string | string[] | undefined }}) {
+export default async function Page({searchParams}: {searchParams: { [key: string]: string | string[] | undefined }}) {
 
-  const { capacity } = searchParams;
+  const { capacity } = await searchParams;
   const filter = (capacity as string) ?? "all";
   
   return (

@@ -3,6 +3,7 @@
 import { auth, signIn, signOut } from "@/app/_lib/auth";
 import { supabase } from "./supabase";
 import { revalidatePath } from "next/cache";
+import { getBookings } from "./data-service";
 
 export async function signInAction() {
   return await signIn("google", { redirectTo: "/account" });
@@ -38,6 +39,11 @@ export async function deleteReservationAction(bookingId: number) {
   const session = await auth();
 
   if (!session) throw new Error("You must be logged in to delete a reservation");
+
+  const guestBookings = await getBookings(Number(session.user?.guestId));
+  const guestBookingIds = guestBookings.map(booking => booking.id);
+
+  if(!guestBookingIds.includes(bookingId)) throw new Error("You are not authorized to delete this reservation");
 
   const { error } = await supabase
     .from("bookings")
