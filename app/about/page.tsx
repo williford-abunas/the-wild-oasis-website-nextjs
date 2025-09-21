@@ -11,8 +11,7 @@ export const metadata = {
 export const revalidate = 86400;
 
 export default async function Page() {
-  // const cabins = await getCabins();
-  const cabins = []
+  const cabins = await getCabins();
 
   return (
     <div className="grid grid-cols-5 gap-x-24 gap-y-32 text-lg items-center">
@@ -30,7 +29,7 @@ export default async function Page() {
             and enjoying simple pleasures with family.
           </p>
           <p>
-            Our {cabins.length} luxury cabins provide a cozy base, but the real
+            Our {cabins?.length} luxury cabins provide a cozy base, but the real
             freedom and peace you&apos;ll find in the surrounding mountains.
             Wander through lush forests, breathe in the fresh air, and watch the
             stars twinkle above from the warmth of a campfire or your hot tub.

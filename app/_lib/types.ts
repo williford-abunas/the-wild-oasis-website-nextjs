@@ -62,7 +62,7 @@ export interface BookingWithCabin {
   guest_id: number;
   cabin_id: number;
   status: string;
-  cabins: { name: string; image: string };
+  cabins: { name: string; image: string }[] | null;
 }
 
 // Type for ReservationCard component (matches the existing structure)
