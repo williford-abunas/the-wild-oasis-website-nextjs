@@ -1,6 +1,6 @@
 "use client";
 
-import Header from "@/app/_components/Header";
+import ClientHeader from "@/app/_components/ClientHeader";
 
 type ErrorProps = {
   error: Error;
@@ -10,7 +10,7 @@ type ErrorProps = {
 export default function Error({ error, reset }: ErrorProps) {
   return (
     <>
-      <Header showBorder={true} />
+      <ClientHeader showBorder={true} />
       <main className="flex justify-center items-center flex-col gap-6 min-h-screen">
         <h1 className="text-3xl font-semibold">Something went wrong!</h1>
         <p className="text-lg">{error.message}</p>

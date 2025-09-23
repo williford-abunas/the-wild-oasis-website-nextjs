@@ -117,7 +117,8 @@ export async function getBookings(guestId: number): Promise<BookingWithCabin[]> 
       "id, created_at, start_date, end_date, number_nights, number_guests, total_price, guest_id, cabin_id, status, cabins(name, image)",
     )
     .eq("guest_id", guestId)
-    .order("start_date");
+    .order("start_date")
+    
 
   if (error) {
     if (error instanceof Error) {
@@ -128,7 +129,10 @@ export async function getBookings(guestId: number): Promise<BookingWithCabin[]> 
     throw new Error("Bookings could not get loaded");
   }
 
-  return data || [];
+  return (data || []).map(booking => ({
+    ...booking,
+    cabins: Array.isArray(booking.cabins) ? booking.cabins[0] : booking.cabins
+  }));
 }
 
 export async function getBookedDatesByCabinId(cabinId: number): Promise<Date[]> {
