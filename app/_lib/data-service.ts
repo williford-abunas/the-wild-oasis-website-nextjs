@@ -110,6 +110,7 @@ export async function getBooking(id: number): Promise<Booking> {
 }
 
 export async function getBookings(guestId: number): Promise<BookingWithCabin[]> {
+  console.log("getBookings", guestId);
   const { data, error, count } = await supabase
     .from("bookings")
     // We actually also need data on the cabins as well. But let's ONLY take the data that we actually need, in order to reduce downloaded data.
@@ -117,8 +118,7 @@ export async function getBookings(guestId: number): Promise<BookingWithCabin[]> 
       "id, created_at, start_date, end_date, number_nights, number_guests, total_price, guest_id, cabin_id, status, cabins(name, image)",
     )
     .eq("guest_id", guestId)
-    .order("start_date")
-    
+    .order("start_date");
 
   if (error) {
     if (error instanceof Error) {
@@ -203,7 +203,10 @@ export async function getCountries(): Promise<Country[]> {
 // CREATE
 
 export async function createGuest(newGuest: CreateGuestData): Promise<Guest[]> {
-  const { data, error } = await supabase.from("guests").insert([newGuest]);
+  const { data, error } = await supabase
+    .from("guests")
+    .insert([newGuest])
+    .select();
 
   if (error) {
     if (error instanceof Error) {

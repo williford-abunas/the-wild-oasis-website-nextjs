@@ -19,24 +19,27 @@ const authConfig: NextAuthConfig = {
       },
       async signIn({ user }: { user: User | AdapterUser }): Promise<boolean> {
         try {
-          const guest = await getGuest(user.email as string);
-
+          let guest = await getGuest(user.email as string);
           if (!guest) {
-           await createGuest({ 
-             email: user.email as string, 
-             full_name: user.name as string,
-           });
-            }
-
-            return true;
+            await createGuest({ 
+              email: user.email as string, 
+              full_name: user.name as string,
+            });
+            guest = await getGuest(user.email as string);
+          }
+          return true;
         } catch (error) {
           console.error("signIn error:", error);
           return false;
         }
       },
-      async jwt({ token, account, profile }: { token: JWT; account?: Account | null; profile?: Profile }) {
+      async jwt({ token, account, profile, user }: { token: JWT; account?: Account | null; profile?: Profile; user?: User | AdapterUser }) {
         // Store user image in token
-        if (account && profile) {
+        if (account && profile && user?.email) {
+          const guest = await getGuest(user.email as string);
+          if (guest) {
+            token.guestId = guest.id.toString();
+          }
             token.picture = profile.picture;
         }
         return token;
@@ -46,11 +49,11 @@ const authConfig: NextAuthConfig = {
             
             if (guest && session?.user) {
               session.user.guestId = guest.id.toString();
-            }
-            // Ensure user image is included in session
-            if (token?.picture && session.user) {
+              if (token?.picture) {
                 session.user.image = token.picture as string;
+              }
             }
+            console.log("session", session);
             return session;
         },
       
