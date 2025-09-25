@@ -16,7 +16,7 @@ import {
   UpdateBookingData,
 } from "@/app/_lib/types";
 
-/////////////
+
 // GET
 
 export async function getCabin(id: number): Promise<Cabin> {
@@ -25,9 +25,6 @@ export async function getCabin(id: number): Promise<Cabin> {
     .select("*")
     .eq("id", id)
     .single();
-
-  // For testing
-  // await new Promise((res) => setTimeout(res, 1000));
 
   if (error) {
     if (error instanceof Error) {
@@ -110,7 +107,6 @@ export async function getBooking(id: number): Promise<Booking> {
 }
 
 export async function getBookings(guestId: number): Promise<BookingWithCabin[]> {
-  console.log("getBookings", guestId);
   const { data, error, count } = await supabase
     .from("bookings")
     // We actually also need data on the cabins as well. But let's ONLY take the data that we actually need, in order to reduce downloaded data.

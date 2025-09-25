@@ -18,13 +18,11 @@ export const ReservationContext = createContext<{
   range: DateRange;
   setRange: (range: DateRange) => void;
   resetRange: () => void;
-  clearPricingData: () => void;
   calculatePricing: (cabin: { regular_price: number; discount: number }) => PricingData;
 }>({
   range: { from: null, to: null },
   setRange: () => {},
   resetRange: () => {},
-  clearPricingData: () => {},
   calculatePricing: () => ({ regularPrice: 0, discount: 0, numNights: 0, cabinPrice: 0 })
 });
 
@@ -37,9 +35,6 @@ function ReservationProvider({ children }: { children: React.ReactNode }) {
     setRange(initialState);
   };
 
-  const clearPricingData = () => {
-    setRange(initialState);
-  };
 
   const calculatePricing = (cabin: { regular_price: number; discount: number }): PricingData => {
     const regularPrice = cabin.regular_price;
@@ -61,7 +56,7 @@ function ReservationProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <ReservationContext.Provider value={{ range, setRange, resetRange, clearPricingData, calculatePricing }}>
+    <ReservationContext.Provider value={{ range, setRange, resetRange, calculatePricing }}>
       {children}
     </ReservationContext.Provider>
   );

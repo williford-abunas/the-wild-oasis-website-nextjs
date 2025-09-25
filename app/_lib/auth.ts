@@ -53,7 +53,6 @@ const authConfig: NextAuthConfig = {
                 session.user.image = token.picture as string;
               }
             }
-            console.log("session", session);
             return session;
         },
       
