@@ -4,20 +4,34 @@ import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useReservation } from '../_context/ReservationContext';
 import { Settings } from '../_lib/types';
-import { Cabin } from '../_lib/types';
+import {
+  months,
+  daysOfWeek,
+  shouldAdjustCalendarPosition,
+  getDaysInMonth,
+  isDateInRange,
+  isDateSelected,
+  isStartDate,
+  isEndDate,
+  isDateBooked,
+  isAlreadyBooked,
+  wouldRangeIncludeBookedDates,
+  isDateDisabled
+} from '../_lib/date-utils';
 
-const DateSelector = ({ settings, bookedDates, cabin }: { settings: Settings, bookedDates: Date[], cabin: Cabin }) => {
+const DateSelector = ({ settings, bookedDates }: { settings: Settings, bookedDates: Date[] }) => {
   const { range, setRange } = useReservation();
   const [currentDate, setCurrentDate] = useState(new Date());
-  // const minBookingLength = settings.min_booking_length;
-  // const maxBookingLength = settings.max_booking_length;
+
+  const minBookingLength = settings.min_booking_length;
+  const maxBookingLength = settings.max_booking_length;
 
   // Auto-scroll to selected dates when component mounts or range changes
   useEffect(() => {
     if (range.from) {
       let newCurrentDate: Date;
       
-      if (range.to && shouldAdjustCalendarPosition()) {
+      if (range.to && shouldAdjustCalendarPosition(range)) {
         // If range spans multiple months, position to show the start date
         // The end date will be visible in the right column if it's the next month
         newCurrentDate = new Date(range.from);
@@ -32,51 +46,11 @@ const DateSelector = ({ settings, bookedDates, cabin }: { settings: Settings, bo
       const today = new Date();
       setCurrentDate(today);
     }
-  }, [range.from, range.to]);
+  }, [range]);
 
-  // Function to check if we need to adjust calendar position to show the entire range
-  const shouldAdjustCalendarPosition = () => {
-    if (!range.from || !range.to) return false;
-    
-    const startMonth = range.from.getMonth();
-    const endMonth = range.to.getMonth();
-    const startYear = range.from.getFullYear();
-    const endYear = range.to.getFullYear();
-    
-    // Check if range spans multiple months
-    const monthDiff = (endYear - startYear) * 12 + (endMonth - startMonth);
-    return monthDiff > 1;
-  };
-
-  const months = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
-  ];
-
-  const daysOfWeek = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
-
-  const getDaysInMonth = (date: Date) => {
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
-    const daysInMonth = lastDay.getDate();
-    const startingDayOfWeek = firstDay.getDay();
-
-    const days: (Date | null)[] = [];
-    
-    // Add empty cells for days before the first day of the month
-    for (let i = 0; i < startingDayOfWeek; i++) {
-      days.push(null);
-    }
-    
-    // Add days of the month
-    for (let day = 1; day <= daysInMonth; day++) {
-      days.push(new Date(year, month, day));
-    }
-    
-    return days;
-  };
+  // Check if current range includes booked dates for this cabin
+  const isCurrentRangeBooked = isAlreadyBooked(range, bookedDates);
+  const displayRange = isCurrentRangeBooked ? { from: null, to: null } : range;
 
   const handleDateClick = (date: Date | null) => {
     const today = new Date();
@@ -86,39 +60,44 @@ const DateSelector = ({ settings, bookedDates, cabin }: { settings: Settings, bo
     if (!range.from || (range.from && range.to)) {
       setRange({ from: date, to: null });
     } else if (range.from && date < range.from) {
-      setRange({ from: date, to: range.from });
+      // Check if the new range would include any booked dates
+      if (wouldRangeIncludeBookedDates(date, range.from, bookedDates)) {
+        // If it would include booked dates, just set the new date as start
+        setRange({ from: date, to: null });
+      } else {
+        // Check minimum booking length
+        const daysDiff = Math.ceil((range.from.getTime() - date.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+        if (daysDiff < minBookingLength) {
+          // If range is too short, just set the new date as start
+          setRange({ from: date, to: null });
+        } else if (daysDiff > maxBookingLength) {
+          // If range is too long, just set the new date as start
+          setRange({ from: date, to: null });
+        } else {
+          setRange({ from: date, to: range.from });
+        }
+      }
     } else {
-      setRange({ ...range, to: date });
+      // Check if the new range would include any booked dates
+      if (wouldRangeIncludeBookedDates(range.from, date, bookedDates)) {
+        // If it would include booked dates, just set the new date as start
+        setRange({ from: date, to: null });
+      } else {
+        // Check minimum and maximum booking length
+        const daysDiff = Math.ceil((date.getTime() - range.from.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+        if (daysDiff < minBookingLength) {
+          // If range is too short, just set the new date as start
+          setRange({ from: date, to: null });
+        } else if (daysDiff > maxBookingLength) {
+          // If range is too long, just set the new date as start
+          setRange({ from: date, to: null });
+        } else {
+          setRange({ ...range, to: date });
+        }
+      }
     }
   };
 
-  const isDateInRange = (date: Date | null) => {
-    if (!date || !range.from || !range.to) return false;
-    return date >= range.from && date <= range.to;
-  };
-
-  const isDateSelected = (date: Date | null) => {
-    if (!date) return false;
-    return (range.from && date.getTime() === range.from.getTime()) ||
-           (range.to && date.getTime() === range.to.getTime());
-  };
-
-  const isStartDate = (date: Date | null) => {
-    if (!date || !range.from) return false;
-    return date.getTime() === range.from.getTime();
-  };
-
-  const isEndDate = (date: Date | null) => {
-    if (!date || !range.to) return false;
-    return date.getTime() === range.to.getTime();
-  };
-
-  const isDateDisabled = (date: Date | null) => {
-    if (!date) return true;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    return date < today;
-  };
 
   const navigateMonth = (direction: number) => {
     const newDate = new Date(currentDate);
@@ -184,7 +163,7 @@ const DateSelector = ({ settings, bookedDates, cabin }: { settings: Settings, bo
             return (
               <div key={index} className="relative">
                 {/* Background highlight for range */}
-                {isDateInRange(date) && !isDateSelected(date) && (
+                {isDateInRange(date, displayRange) && !isDateSelected(date, displayRange) && !isDateBooked(date, bookedDates) && (
                   <div 
                     className={`
                       absolute h-9 w-9 bg-accent-500/20
@@ -195,24 +174,30 @@ const DateSelector = ({ settings, bookedDates, cabin }: { settings: Settings, bo
                 )}
                 
                 {/* Continuous background for start/end dates */}
-                {isStartDate(date) && range.to && (
+                {isStartDate(date, displayRange) && displayRange.to && !isDateBooked(date, bookedDates) && (
                   <div className="absolute h-9 w-9 bg-accent-500/20 rounded-l-full z-10" />
                 )}
-                {isEndDate(date) && range.from && (
+                {isEndDate(date, displayRange) && displayRange.from && !isDateBooked(date, bookedDates) && (
                   <div className="absolute h-9 w-9 bg-accent-500/20 rounded-r-full z-10" />
                 )}
                 
                 <button
                   onClick={() => handleDateClick(date)}
-                  disabled={isDateDisabled(date)}
+                  disabled={isDateDisabled(date) || isDateBooked(date, bookedDates)}
                   className={`
                     relative h-9 w-9 text-sm font-medium transition-colors z-10
                     ${!date ? 'invisible' : ''}
                     ${isDateDisabled(date) 
                       ? 'text-primary-500 cursor-not-allowed' 
+                      : isDateBooked(date, bookedDates)
+                      ? 'text-primary-100 cursor-not-allowed'
                       : 'text-primary-100 hover:bg-primary-700'
                     }
-                    ${isDateSelected(date) 
+                    ${isDateBooked(date, bookedDates)
+                      ? 'bg-red-500/50 text-primary-900 rounded-full'
+                      : ''
+                    }
+                    ${isDateSelected(date, displayRange) && !isDateBooked(date, bookedDates) 
                       ? 'bg-accent-500 text-primary-900 rounded-full' 
                       : ''
                     }
