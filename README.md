@@ -2,7 +2,7 @@
 
 A luxury cabin rental website built with Next.js, featuring a modern booking system for mountain retreats in the Italian Dolomites.
 
-> **⚠️ Disclaimer**: This is a personal project for learning and portfolio purposes only. The Wild Oasis is not a real business or actual place. This project was created to demonstrate full-stack web development skills using modern technologies.
+> **⚠️ Disclaimer**: This is a personal project for learning and portfolio purposes only. The Wild Oasis is not a real business or actual place. This project was created to demonstrate full-stack web development skills using modern technologies. Based off Udemy tutorial Ultimate React by Jonas Schmedtman.
 
 ### Key Features
 - **Luxury Cabin Rentals**: Browse and book from a selection of premium mountain cabins
